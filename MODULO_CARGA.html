@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente de Atraque - Puerto de Acajutla</title>
+    <!-- Tailwind CSS para diseño moderno, limpio y profesional -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos portuarios e industriales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS para leer archivos Excel (.xlsx) directamente en el navegador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0B1E36',
+                            900: '#051120',
+                        },
+                        acajutla: {
+                            blue: '#0F2C59',
+                            teal: '#1D70B8',
+                            orange: '#F0803C'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR ESTILO CEPA -->
+    <nav class="bg-navy-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-acajutla-orange p-2 rounded-lg">
+                        <i class="fa-solid fa-anchor text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg block tracking-wider">PUERTO DE ACAJUTLA</span>
+                        <span class="text-xs text-slate-400 block -mt-1">Asistente de Inteligencia Artificial para Logística de Atraque</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="bg-acajutla-blue text-xs px-3 py-1 rounded-full text-blue-200 border border-blue-800 font-mono">
+                        Módulo 1: Registro Automatizado
+                    </span>
+                    <span class="text-xs text-slate-400 hidden sm:inline-block">
+                        <i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Datos Procesados Localmente
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CUERPO PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- BIENVENIDA Y EXPLICACIÓN -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 mb-8">
+            <div class="sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-navy-800">Carga de Programación Diaria de Buques</h1>
+                    <p class="text-slate-600 mt-1">
+                        Sube la hoja de control de buques de Acajutla. El asistente de IA mapeará y validará los calados, esloras y ventanas de operación automáticamente.
+                    </p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex gap-2">
+                    <button onclick="descargarPlantillaReal()" class="inline-flex items-center px-4 py-2 border border-emerald-600 rounded-lg text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 shadow-sm transition">
+                        <i class="fa-solid fa-file-excel mr-2"></i> Descargar Formato del Puerto (.xlsx)
+                    </button>
+                </div>
+            </div>
+
+            <!-- EXPLICACIÓN DEL FORMATO DETECTADO -->
+            <div class="mt-6 bg-blue-50/50 rounded-lg p-4 border border-blue-100">
+                <h4 class="text-xs font-semibold text-blue-900 uppercase tracking-wider mb-2 flex items-center">
+                    <i class="fa-solid fa-circle-info mr-1.5 text-blue-500"></i> Estructura del Formato Acajutla Detectada:
+                </h4>
+                <p class="text-xs text-slate-600 mb-3">El sistema está sincronizado para leer de forma nativa la siguiente estructura de tu archivo de Excel:</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-xs">
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">Buque</strong>Nombre de Nave</div>
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">ETA</strong>Arribo Estimado</div>
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">Eslora (m)</strong>Longitud (Largo)</div>
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">Calado requeri</strong>Profundidad mínima</div>
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">Carga</strong>Tipo de Carga</div>
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">Inicio atraque</strong>Fecha planificada</div>
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">Fin operación</strong>Término estimado</div>
+                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm"><strong class="text-navy-800 block mb-0.5">Horas oper.</strong>Duración (Horas)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- ÁREA DE CARGA DE ARCHIVO (COLUMNA 1) -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-navy-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i> Subir Excel de Operaciones
+                    </h3>
+                    
+                    <!-- ZONA DROPZONE -->
+                    <div id="dropzone" class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-acajutla-teal hover:bg-blue-50/50 transition cursor-pointer group relative">
+                        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="procesarArchivoEntrada(event)">
+                        <div class="space-y-3">
+                            <div class="mx-auto w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center group-hover:scale-110 transition">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-600 text-2xl"></i>
+                            </div>
+                            <div class="text-sm">
+                                <span class="font-semibold text-acajutla-teal group-hover:text-navy-800 transition">Haz clic para buscar</span> o arrastra tu archivo Excel aquí
+                            </div>
+                            <p class="text-xs text-slate-400">Archivos permitidos: .xlsx, .xls</p>
+                        </div>
+                    </div>
+
+                    <!-- ESTADO DEL ARCHIVO -->
+                    <div id="fileInfo" class="mt-4 hidden p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            <i class="fa-solid fa-file-invoice text-emerald-600 text-xl flex-shrink-0"></i>
+                            <div class="overflow-hidden">
+                                <p id="fileName" class="text-sm font-semibold truncate text-slate-700"></p>
+                                <p id="fileSize" class="text-xs text-slate-400"></p>
+                            </div>
+                        </div>
+                        <button onclick="reiniciarCarga()" class="text-red-500 hover:text-red-700 text-sm p-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LÍMITES OPERATIVOS DE ACAJUTLA -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-navy-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i class="fa-solid fa-circle-exclamation text-amber-500 mr-1.5"></i> Umbrales de Seguridad (Acajutla)
+                    </h3>
+                    <p class="text-xs text-slate-500 mb-4">El asistente utiliza estos límites para validar automáticamente si los buques en tránsito pueden ingresar de forma segura.</p>
+                    <div class="space-y-3 text-xs">
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span class="text-slate-600">Calado Máximo Permitido</span>
+                            <span class="font-bold text-navy-800">14.0 metros</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span class="text-slate-600">Eslora Máxima Sugerida</span>
+                            <span class="font-bold text-navy-800">270 metros</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 text-emerald-700">
+                            <span>Sincronización con Marea</span>
+                            <span class="font-bold">Activo (Módulo 3)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DE VISTA PREVIA Y CONTROL (COLUMNA 2 Y 3) -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- DIÁLOGO DE MAPEO INTELIGENTE (AUTOACTIVADO SI CAMBIAN LAS COLUMNAS) -->
+                <div id="mapeoCard" class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-navy-800 flex items-center">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-2"></i> Mapeador Inteligente de Columnas
+                        </h3>
+                        <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">Asociación de Campos</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-4">
+                        Si tu plantilla de Excel utiliza títulos diferentes, asócialos aquí. Para tu plantilla estándar de Acajutla, el sistema ya realiza este paso de manera automática:
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="mapeadorCampos">
+                        <!-- Generado dinámicamente -->
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="confirmarMapeoYProcesar()" class="px-5 py-2.5 bg-acajutla-teal hover:bg-acajutla-blue text-white font-bold rounded-lg text-sm shadow transition">
+                            Procesar y Validar Datos <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR DE LA VISTA PREVIA DE LOS DATOS EXTRAÍDOS -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-navy-800 flex items-center">
+                                <i class="fa-solid fa-table-list text-acajutla-teal mr-2"></i> Buques Detectados en el Excel
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-1">Verificación de datos operativos antes de guardar.</p>
+                        </div>
+                        <div id="controlesImportacion" class="hidden space-x-2">
+                            <button onclick="cancelarPrevia()" class="px-3 py-1.5 border border-slate-300 text-slate-600 rounded-lg text-xs hover:bg-slate-50 transition">
+                                Descartar
+                            </button>
+                            <button onclick="guardarDatosEnFondeadero()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs shadow transition">
+                                <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Confirmar e Importar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TABLA PREVIA -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-navy-800 uppercase tracking-wider">Seguridad</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-navy-800 uppercase tracking-wider">Buque / Carga</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-navy-800 uppercase tracking-wider">Dimensiones</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-navy-800 uppercase tracking-wider">Cronograma Operativo</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-navy-800 uppercase tracking-wider">Estadía</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaVistaPrevia" class="bg-white divide-y divide-slate-100">
+                                <tr id="placeholderPrevia">
+                                    <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                                        <i class="fa-solid fa-folder-open text-4xl mb-3 block opacity-40"></i>
+                                        Sube tu archivo de Excel en el panel izquierdo para previsualizar los datos aquí.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- LISTADO HISTÓRICO DE BUQUES EN FONDEADERO (PERSISTENCIA LOCAL) -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="text-md font-bold text-navy-800">Panel de Control de Buques Importados</h3>
+                            <p class="text-xs text-slate-500">Historial activo de buques listos para asignación en el puerto.</p>
+                        </div>
+                        <button onclick="limpiarBaseCompleta()" class="text-xs text-red-500 hover:text-red-700 flex items-center font-semibold">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Limpiar Registro Activo
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 text-slate-500">
+                                <tr>
+                                    <th class="px-4 py-2.5 text-left text-xs font-bold uppercase">Buque (Carga)</th>
+                                    <th class="px-4 py-2.5 text-left text-xs font-bold uppercase">Medidas</th>
+                                    <th class="px-4 py-2.5 text-left text-xs font-bold uppercase">ETA / Atraque Planificado</th>
+                                    <th class="px-4 py-2.5 text-left text-xs font-bold uppercase">Operación</th>
+                                    <th class="px-4 py-2.5 text-left text-xs font-bold uppercase">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaFondeadero" class="text-xs divide-y divide-slate-100">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- NOTIFICACIÓN TIPO TOAST PERSONALIZADA -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 bg-navy-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 z-50">
+        <i id="toastIcon" class="fa-solid text-xl"></i>
+        <span id="toastMsg" class="text-sm font-medium"></span>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA Y DETECTORES DE INTERACCIÓN -->
+    <script>
+        // Límites físicos para salvaguarda de operaciones
+        const CALADO_LIMITE = 14.0;
+        const ESLORA_LIMITE = 270.0;
+
+        // Variables de almacenamiento temporal
+        let excelDataTemporal = [];
+        let headersDetectados = [];
+        let columnasEmparejadas = {
+            nombre: '',
+            eta: '',
+            eslora: '',
+            calado: '',
+            tipoCarga: '',
+            inicioAtraque: '',
+            finOperacion: '',
+            horasOperacion: ''
+        };
+        let buquesProcesados = [];
+
+        window.onload = function() {
+            cargarFondeaderoDesdeLocal();
+            configurarDropzone();
+        };
+
+        // Configuración de la zona de arrastre del archivo
+        function configurarDropzone() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-acajutla-teal', 'bg-blue-50/50');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('border-acajutla-teal', 'bg-blue-50/50');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-acajutla-teal', 'bg-blue-50/50');
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    procesarArchivoEntrada({ target: fileInput });
+                }
+            });
+        }
+
+        // Lector del archivo Excel con SheetJS
+        function procesarArchivoEntrada(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileName').innerText = file.name;
+            document.getElementById('fileSize').innerText = (file.size / 1024).toFixed(1) + ' KB';
+            document.getElementById('fileInfo').classList.remove('hidden');
+            document.getElementById('dropzone').classList.add('hidden');
+
+            showToast("Analizando archivo Excel del puerto...", "fa-arrows-spin text-amber-500 animate-spin");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    
+                    if (jsonData.length === 0) {
+                        throw new Error("El archivo está vacío.");
+                    }
+
+                    excelDataTemporal = jsonData;
+                    headersDetectados = Object.keys(jsonData[0]);
+                    
+                    mapearColumnasInteligentemente();
+                } catch (error) {
+                    showToast("Error en formato: " + error.message, "fa-circle-xmark text-red-500");
+                    reiniciarCarga();
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Mapeo inteligente con soporte de sinónimos exactos para la hoja del Puerto de Acajutla
+        function mapearColumnasInteligentemente() {
+            const diccionarioSinonimos = {
+                nombre: ['buque', 'nombre', 'nave', 'vessel', 'embarcacion'],
+                eta: ['eta', 'arribo', 'fecha arribo', 'arrival'],
+                eslora: ['eslora (m)', 'eslora', 'largo', 'loa'],
+                calado: ['calado requeri', 'calado requerido', 'calado', 'draft', 'calado_requerido'],
+                tipoCarga: ['carga', 'tipo carga', 'tipo de carga', 'cargotype', 'cargo'],
+                inicioAtraque: ['inicio atraque', 'fecha atraque', 'inicio_atraque', 'berthing start'],
+                finOperacion: ['fin operación', 'fin operacion', 'fin_operacion', 'operacion fin', 'operation end'],
+                horasOperacion: ['horas operación', 'horas operacion', 'horas_operacion', 'duracion horas', 'duracion']
+            };
+
+            // Intentar enlazar automáticamente
+            Object.keys(columnasEmparejadas).forEach(key => {
+                columnasEmparejadas[key] = '';
+                for (let header of headersDetectados) {
+                    const cleanHeader = header.toLowerCase().trim();
+                    if (diccionarioSinonimos[key].some(sin => cleanHeader === sin || cleanHeader.includes(sin))) {
+                        columnasEmparejadas[key] = header;
+                        break;
+                    }
+                }
+            });
+
+            // Si los campos obligatorios se enlazaron automáticamente, procedemos directo a procesar
+            if (columnasEmparejadas.nombre && columnasEmparejadas.eslora && columnasEmparejadas.calado) {
+                confirmarMapeoYProcesar(true); // Procesamiento silencioso
+            } else {
+                mostrarMapeadorManual();
+            }
+        }
+
+        // Mostrar mapeador de columnas en caso de variaciones en la hoja de Excel
+        function mostrarMapeadorManual() {
+            const container = document.getElementById('mapeadorCampos');
+            container.innerHTML = '';
+
+            const camposConfig = [
+                { id: 'nombre', etiqueta: 'Buque', icono: 'fa-ship', req: true },
+                { id: 'eta', etiqueta: 'ETA (Fecha y Hora)', icono: 'fa-clock', req: true },
+                { id: 'eslora', etiqueta: 'Eslora (m)', icono: 'fa-arrows-left-right', req: true },
+                { id: 'calado', etiqueta: 'Calado requeri', icono: 'fa-anchor', req: true },
+                { id: 'tipoCarga', etiqueta: 'Carga', icono: 'fa-boxes-stacked', req: true },
+                { id: 'inicioAtraque', etiqueta: 'Inicio atraque', icono: 'fa-calendar-plus', req: false },
+                { id: 'finOperacion', etiqueta: 'Fin operación', icono: 'fa-calendar-check', req: false },
+                { id: 'horasOperacion', etiqueta: 'Horas oper.', icono: 'fa-hourglass-half', req: false }
+            ];
+
+            camposConfig.forEach(campo => {
+                const selectDiv = document.createElement('div');
+                selectDiv.className = "flex flex-col space-y-1 p-2 bg-slate-50 border border-slate-200 rounded-lg";
+                
+                let options = `<option value="">-- No Incluido --</option>`;
+                headersDetectados.forEach(header => {
+                    const selected = (columnasEmparejadas[campo.id] === header) ? 'selected' : '';
+                    options += `<option value="${header}" ${selected}>${header}</option>`;
+                });
+
+                selectDiv.innerHTML = `
+                    <label class="text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                        <span><i class="fa-solid ${campo.icono} text-slate-400 mr-1"></i> ${campo.etiqueta} ${campo.req ? '<span class="text-red-500">*</span>' : ''}</span>
+                    </label>
+                    <select id="map-${campo.id}" class="text-xs p-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-acajutla-teal focus:outline-none">
+                        ${options}
+                    </select>
+                `;
+                container.appendChild(selectDiv);
+            });
+
+            document.getElementById('mapeoCard').classList.remove('hidden');
+        }
+
+        // Procesar datos finales y validar condiciones de seguridad marítima
+        function confirmarMapeoYProcesar(silencioso = false) {
+            if (!silencioso) {
+                columnasEmparejadas.nombre = document.getElementById('map-nombre').value;
+                columnasEmparejadas.eta = document.getElementById('map-eta').value;
+                columnasEmparejadas.eslora = document.getElementById('map-eslora').value;
+                columnasEmparejadas.calado = document.getElementById('map-calado').value;
+                columnasEmparejadas.tipoCarga = document.getElementById('map-tipoCarga').value;
+                columnasEmparejadas.inicioAtraque = document.getElementById('map-inicioAtraque').value;
+                columnasEmparejadas.finOperacion = document.getElementById('map-finOperacion').value;
+                columnasEmparejadas.horasOperacion = document.getElementById('map-horasOperacion').value;
+            }
+
+            if (!columnasEmparejadas.nombre || !columnasEmparejadas.eslora || !columnasEmparejadas.calado) {
+                showToast("Por favor asocia al menos las columnas de Buque, Eslora y Calado", "fa-triangle-exclamation text-amber-500");
+                mostrarMapeadorManual();
+                return;
+            }
+
+            buquesProcesados = excelDataTemporal.map((row, index) => {
+                let esloraVal = parseFloat(row[columnasEmparejadas.eslora]) || 0;
+                let caladoVal = parseFloat(row[columnasEmparejadas.calado]) || 0;
+                let horasVal = parseFloat(row[columnasEmparejadas.horasOperacion]) || 0;
+
+                let fechaEta = parseExcelDate(row[columnasEmparejadas.eta]);
+                let fechaInicio = parseExcelDate(row[columnasEmparejadas.inicioAtraque]);
+                let fechaFin = parseExcelDate(row[columnasEmparejadas.finOperacion]);
+
+                let alertas = [];
+                if (caladoVal > CALADO_LIMITE) {
+                    alertas.push(`Calado requerido (${caladoVal}m) supera el límite del canal de entrada (${CALADO_LIMITE}m).`);
+                }
+                if (esloraVal > ESLORA_LIMITE) {
+                    alertas.push(`La eslora de la nave (${esloraVal}m) excede las capacidades recomendadas de muelle directo.`);
+                }
+
+                return {
+                    id: 'BUQUE-' + Date.now() + '-' + index,
+                    nombre: String(row[columnasEmparejadas.nombre] || `BUQUE NO INDENTIFICADO #${index+1}`).toUpperCase(),
+                    eta: fechaEta,
+                    eslora: esloraVal,
+                    calado: caladoVal,
+                    tipoCarga: row[columnasEmparejadas.tipoCarga] ? String(row[columnasEmparejadas.tipoCarga]).trim() : 'General',
+                    inicioAtraque: fechaInicio !== 'No definida' ? fechaInicio : fechaEta,
+                    finOperacion: fechaFin,
+                    horasOperacion: horasVal,
+                    alertas: alertas,
+                    valido: alertas.length === 0
+                };
+            });
+
+            document.getElementById('mapeoCard').classList.add('hidden');
+            renderizarVistaPrevia();
+            showToast("Planilla analizada con éxito", "fa-circle-check text-emerald-500");
+        }
+
+        // Formateador robusto de fechas procedentes de Excel
+        function parseExcelDate(val) {
+            if (!val) return 'No definida';
+            
+            // Si el valor es de tipo numérico (formato serial de Excel)
+            if (typeof val === 'number') {
+                const date = new Date((val - 25569) * 86400 * 1000);
+                return date.toISOString().slice(0, 16).replace('T', ' ');
+            }
+            
+            const dateObj = new Date(val);
+            if (!isNaN(dateObj.getTime())) {
+                return dateObj.toISOString().slice(0, 16).replace('T', ' ');
+            }
+            
+            return String(val);
+        }
+
+        // Mostrar tabla con alertas antes de consolidar la base de datos local
+        function renderizarVistaPrevia() {
+            const tbody = document.getElementById('tablaVistaPrevia');
+            tbody.innerHTML = '';
+
+            if (buquesProcesados.length === 0) {
+                // Generar dinámicamente el placeholder para evitar dependencias de elementos borrados
+                tbody.innerHTML = `
+                    <tr id="placeholderPrevia">
+                        <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                            <i class="fa-solid fa-folder-open text-4xl mb-3 block opacity-40"></i>
+                            Sube tu archivo de Excel en el panel izquierdo para previsualizar los datos aquí.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('controlesImportacion').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('controlesImportacion').classList.remove('hidden');
+
+            buquesProcesados.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.className = b.valido ? "hover:bg-slate-50 transition" : "bg-red-50/50 hover:bg-red-50 transition";
+                
+                let badgeSeguridad = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-circle-check mr-1"></i> Seguro</span>`;
+                if (!b.valido) {
+                    badgeSeguridad = `
+                        <div class="group relative inline-block cursor-pointer">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 animate-pulse">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Alerta (${b.alertas.length})
+                            </span>
+                            <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 bg-slate-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-10">
+                                ${b.alertas.map(al => `• ${al}`).join('<br>')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-xs">${badgeSeguridad}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <div class="text-sm font-bold text-navy-800">${b.nombre}</div>
+                        <span class="bg-blue-100 text-blue-800 text-[10px] px-1.5 py-0.5 rounded font-medium">${b.tipoCarga}</span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-xs text-slate-600 font-mono">
+                        Eslora: <strong>${b.eslora} m</strong><br>
+                        Calado: <strong class="${b.calado > CALADO_LIMITE ? 'text-red-600' : 'text-slate-800'}">${b.calado} m</strong>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-xs text-slate-600 font-mono">
+                        ETA: ${b.eta}<br>
+                        Inicio Atraque: ${b.inicioAtraque}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-xs">
+                        <span class="font-bold font-mono text-slate-700">${b.horasOperacion ? b.horasOperacion + ' hrs' : 'N/D'}</span><br>
+                        <span class="text-slate-400 text-[10px]">Planificadas</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Guardar datos en el almacén local del navegador
+        function guardarDatosEnFondeadero() {
+            let buquesActuales = JSON.parse(localStorage.getItem('acajutla_buques_v2')) || [];
+            
+            const anterior = buquesActuales.length;
+            buquesProcesados.forEach(b => {
+                // Previene duplicidad de nombres en el mismo lote
+                if (buquesActuales.some(existente => existente.nombre === b.nombre && existente.eta === b.eta)) {
+                    return; 
+                }
+                buquesActuales.push({
+                    id: b.id,
+                    nombre: b.nombre,
+                    eslora: b.eslora,
+                    calado: b.calado,
+                    tipoCarga: b.tipoCarga,
+                    eta: b.eta,
+                    inicioAtraque: b.inicioAtraque,
+                    finOperacion: b.finOperacion,
+                    horasOperacion: b.horasOperacion,
+                    estado: 'En Espera (Fondeadero)'
+                });
+            });
+
+            localStorage.setItem('acajutla_buques_v2', JSON.stringify(buquesActuales));
+            const totalCargados = buquesActuales.length - anterior;
+
+            showToast(`¡Transacción completada! ${totalCargados} buques registrados.`, "fa-ship text-white");
+            
+            reiniciarCarga();
+            cargarFondeaderoDesdeLocal();
+        }
+
+        // Cargar los buques guardados en el listado de control operativo
+        function cargarFondeaderoDesdeLocal() {
+            const listado = JSON.parse(localStorage.getItem('acajutla_buques_v2')) || [];
+            const tbody = document.getElementById('tablaFondeadero');
+            tbody.innerHTML = '';
+
+            if (listado.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-4 py-8 text-center text-slate-400 font-medium">
+                            <i class="fa-solid fa-hard-drive text-3xl mb-2 block opacity-30"></i>
+                            No hay registros almacenados. Sube la hoja de Excel para iniciar operaciones.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            listado.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="px-4 py-3">
+                        <span class="font-bold text-navy-800">${b.nombre}</span><br>
+                        <span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-semibold">${b.tipoCarga}</span>
+                    </td>
+                    <td class="px-4 py-3 text-slate-600 font-mono">
+                        ${b.eslora}m Eslora<br>
+                        <span class="text-acajutla-teal font-bold">${b.calado}m Calado</span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-slate-600">
+                        ETA: ${b.eta}<br>
+                        Atraque: ${b.inicioAtraque}
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="font-bold font-mono text-slate-700">${b.horasOperacion ? b.horasOperacion + ' horas' : 'No definido'}</span><br>
+                        <span class="text-[10px] text-slate-400 font-mono">Fin: ${b.finOperacion || 'S/D'}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                            Fondeado
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Limpiar base de datos local
+        function limpiarBaseCompleta() {
+            if (confirm("¿Estás seguro de que deseas vaciar toda la zona de fondeadero? Esto eliminará todos los registros.")) {
+                localStorage.removeItem('acajutla_buques_v2');
+                cargarFondeaderoDesdeLocal();
+                showToast("Historial de fondeadero borrado.", "fa-trash-can text-red-500");
+            }
+        }
+
+        // Restablecer dropzone e input para una nueva lectura
+        function reiniciarCarga() {
+            excelDataTemporal = [];
+            headersDetectados = [];
+            buquesProcesados = [];
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+            document.getElementById('dropzone').classList.remove('hidden');
+            document.getElementById('mapeoCard').classList.add('hidden');
+            renderizarVistaPrevia();
+        }
+
+        function cancelarPrevia() {
+            buquesProcesados = [];
+            renderizarVistaPrevia();
+        }
+
+        // Generar y descargar el archivo Excel plantilla EXACTO a la imagen enviada por el usuario
+        function descargarPlantillaReal() {
+            const plantillaData = [
+                {
+                    "Buque": "MV PACIFIC STAR",
+                    "ETA": "2026-05-27 06:00",
+                    "Eslora (m)": 180,
+                    "Calado requeri": 11.1,
+                    "Carga": "Contenedores",
+                    "Inicio atraque": "2026-05-27 06:00",
+                    "Fin operación": "2026-05-27 18:00",
+                    "Horas operación": 12
+                },
+                {
+                    "Buque": "MT OCEAN FUEL",
+                    "ETA": "2026-05-27 08:00",
+                    "Eslora (m)": 150,
+                    "Calado requeri": 9.5,
+                    "Carga": "Granel líquido",
+                    "Inicio atraque": "2026-05-27 08:00",
+                    "Fin operación": "2026-05-27 16:00",
+                    "Horas operación": 8
+                },
+                {
+                    "Buque": "MV BULK CARRIER",
+                    "ETA": "2026-05-27 10:00",
+                    "Eslora (m)": 170,
+                    "Calado requeri": 9.5,
+                    "Carga": "Granel sólido",
+                    "Inicio atraque": "2026-05-27 10:00",
+                    "Fin operación": "2026-05-27 22:00",
+                    "Horas operation": 12
+                }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(plantillaData);
+            
+            // Forzar anchos de columna para visualización profesional en Excel
+            ws['!cols'] = [
+                { wch: 22 }, // Buque
+                { wch: 18 }, // ETA
+                { wch: 12 }, // Eslora
+                { wch: 15 }, // Calado requerido
+                { wch: 16 }, // Carga
+                { wch: 18 }, // Inicio atraque
+                { wch: 18 }, // Fin operacion
+                { wch: 15 }  // Horas operacion
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws, "Control_Arribos_Acajutla");
+            XLSX.writeFile(wb, "Programacion_Buques_Acajutla.xlsx");
+            showToast("Plantilla oficial de Acajutla descargada", "fa-file-excel text-emerald-500");
+        }
+
+        // Toast de alertas
+        function showToast(msg, iconClass) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const message = document.getElementById('toastMsg');
+
+            icon.className = "fa-solid " + iconClass;
+            message.innerText = msg;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
