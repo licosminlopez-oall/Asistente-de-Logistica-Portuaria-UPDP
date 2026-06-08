@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 2: Configuración de Muelles - Acajutla</title>
+    
+    <!-- Tailwind CSS para diseño moderno, limpio y profesional -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos portuarios e industriales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            700: '#1B365D',
+                            800: '#0F2C59',
+                            900: '#051120',
+                        },
+                        acajutla: {
+                            blue: '#1D70B8',
+                            teal: '#1D70B8',
+                            orange: '#F0803C'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR ESTILO CEPA -->
+    <nav class="bg-navy-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Identificación -->
+                <div class="flex items-center space-x-3">
+                    <a href="index.html" class="bg-acajutla-orange p-2 rounded-lg hover:bg-orange-500 transition shadow" title="Volver a la Portada">
+                        <i class="fa-solid fa-arrow-left text-white text-base"></i>
+                    </a>
+                    <div>
+                        <span class="font-bold text-sm sm:text-base block tracking-wider">PUERTO DE ACAJUTLA</span>
+                        <span class="text-[10px] text-slate-400 block -mt-1 font-mono">Módulo 2: Configuración de Muelles</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-xs font-bold text-slate-300 hover:text-white transition flex items-center">
+                        <i class="fa-solid fa-house mr-1.5"></i> Portada Principal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CUERPO PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- BIENVENIDA Y EXPLICACIÓN -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 mb-8">
+            <div class="sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-navy-800 flex items-center">
+                        <i class="fa-solid fa-hard-hat text-acajutla-orange mr-2"></i> Espectro Operativo de Atracaderos
+                    </h2>
+                    <p class="text-slate-600 mt-1 text-sm">
+                        Asigna de forma interactiva y segura los buques del fondeadero a los muelles oficiales del puerto de acuerdo a los límites hidrográficos oficiales de CEPA.
+                    </p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-2">
+                    <a href="index.html" class="inline-flex items-center justify-center px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition">
+                        <i class="fa-solid fa-house mr-2 text-slate-500"></i> Volver a Portada
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- PANEL DE CONTROL LATERAL (4 COLUMNAS): FONDEADERO Y ATRAQUE -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- BUQUES EN FONDEADERO -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-navy-800 uppercase tracking-wider mb-4 flex items-center justify-between border-b pb-2">
+                        <span><i class="fa-solid fa-ship text-acajutla-teal mr-1.5"></i> Buques en Fondeadero</span>
+                        <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold" id="badge-fondeadero-cnt">0</span>
+                    </h3>
+                    
+                    <div class="space-y-3 max-h-[220px] overflow-y-auto pr-1" id="lista-fondeadero">
+                        <!-- Carga dinámica -->
+                    </div>
+                </div>
+
+                <!-- CONTROLLER: ATRAQUE MANUAL / AUTOMÁTICO -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-navy-800 uppercase tracking-wider mb-4 border-b pb-2">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-600 mr-1.5"></i> Control de Maniobra
+                    </h3>
+                    
+                    <div class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1.5">Seleccionar Nave:</label>
+                            <select id="select-buque" onchange="actualizarChequeoCompatibilidad()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-acajutla-teal">
+                                <option value="">-- Buques Fondeados --</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1.5">Seleccionar Muelle de Destino:</label>
+                            <select id="select-muelle" onchange="actualizarChequeoCompatibilidad()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-acajutla-teal">
+                                <option value="">-- Muelle de Atraque --</option>
+                                <option value="muelle-1">Muelle 1 (Prof: 12.60m - 13.60m)</option>
+                                <option value="muelle-2">Muelle 2 (Prof: 7.60m - 11.80m)</option>
+                                <option value="muelle-3">Muelle 3 (Prof: 6.40m - 12.10m)</option>
+                                <option value="muelle-4">Muelle 4 (Prof: 7.90m - 9.80m)</option>
+                                <option value="muelle-5">Muelle 5 (Prof: 9.50m - 10.40m)</option>
+                            </select>
+                        </div>
+
+                        <!-- PANEL DE VALIDACIÓN IN SITU -->
+                        <div id="check-panel" class="hidden bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                            <span class="block font-bold text-navy-800 text-[10px] uppercase tracking-wider">Verificación Técnica CEPA</span>
+                            <div class="flex items-center justify-between text-[11px]" id="check-eslora">
+                                <span class="text-slate-600">Límetro de Eslora:</span>
+                                <span class="font-bold">--</span>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px]" id="check-calado">
+                                <span class="text-slate-600">Seguridad de Calado:</span>
+                                <span class="font-bold">--</span>
+                            </div>
+                        </div>
+
+                        <button onclick="ejecutarAtraque()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition text-center shadow-md flex items-center justify-center space-x-1.5">
+                            <i class="fa-solid fa-anchor"></i>
+                            <span>Autorizar Maniobra de Entrada</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LEYENDA OPERATIVA -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 text-xs">
+                    <span class="block font-bold text-navy-900 uppercase tracking-widest text-[10px] mb-3">Simbología del Puerto</span>
+                    <div class="space-y-2 text-[11px]">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 bg-red-500 rounded-full inline-block"></span>
+                            <span class="text-slate-600">Alerta de sobrecalado (Riesgo de Encallamiento)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 bg-emerald-500 rounded-full inline-block"></span>
+                            <span class="text-slate-600">Calado adecuado para la maniobra segura</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DIGITAL TWIN DEL PUERTO (8 COLUMNAS) -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- MAPA ESQUEMÁTICO DEL PUERTO (CEPA OFICIAL) -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4 border-b pb-3">
+                        <div>
+                            <h3 class="font-bold text-navy-800">Gemelo Digital: Distribución de Diques</h3>
+                            <p class="text-[11px] text-slate-500">Coloca el cursor sobre cualquier buque atracado para auditar sus métricas operativas.</p>
+                        </div>
+                        <button onclick="liberarTodo()" class="text-xs text-red-500 hover:text-red-700 font-bold flex items-center">
+                            <i class="fa-solid fa-rotate mr-1"></i> Desatracar Todo
+                        </button>
+                    </div>
+
+                    <!-- CONTAINER DEL MAPA INTERACTIVO -->
+                    <div class="relative bg-[#cbdfe3]/40 rounded-xl overflow-hidden border border-slate-200 p-2 flex items-center justify-center" style="min-height: 480px;">
+                        
+                        <!-- MAPA VECTORIAL SVG DEL PUERTO -->
+                        <svg viewBox="0 0 1000 600" class="w-full h-auto select-none font-sans">
+                            <!-- Definición de Gradientes -->
+                            <defs>
+                                <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#b8dadf"/>
+                                    <stop offset="100%" stop-color="#8bbabf"/>
+                                </linearGradient>
+                                <linearGradient id="landGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#d1e3dd"/>
+                                    <stop offset="100%" stop-color="#b2ccd4"/>
+                                </linearGradient>
+                                <linearGradient id="dockGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#475569"/>
+                                    <stop offset="100%" stop-color="#334155"/>
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Fondo de Agua -->
+                            <rect width="1000" height="600" fill="url(#oceanGrad)"/>
+
+                            <!-- Bahía y Canal de Navegación Límites -->
+                            <path d="M 50,550 L 950,550 L 950,50 L 600,50 Z" fill="none" stroke="#2563eb" stroke-dasharray="6,6" stroke-width="1.5" opacity="0.3"/>
+
+                            <!-- Contorno de Tierra (Sonsonate / Acajutla) -->
+                            <path d="M 0,0 L 400,0 C 420,50 480,100 520,150 C 560,200 600,210 650,220 C 720,230 750,250 800,280 C 850,300 900,320 1000,310 L 1000,600 L 0,600 Z" fill="url(#landGrad)"/>
+
+                            <!-- ============================================== -->
+                            <!-- DIBUJO DE MUELLES (CEPA INFOGRAPHIC LAYOUT) -->
+                            <!-- ============================================== -->
+
+                            <!-- Muelle 1 (Contradique Rompeolas Diagonal Izquierdo) -->
+                            <path d="M 120,240 L 280,480 L 320,460 L 160,220 Z" fill="url(#dockGrad)" stroke="#1e293b" stroke-width="2"/>
+                            <!-- Línea de Atraque Muelle 1 -->
+                            <line x1="280" y1="480" x2="120" y2="240" stroke="#f0803c" stroke-width="3" stroke-dasharray="4,4"/>
+
+                            <!-- Muelle 2 (Pier horizontal en la parte baja) -->
+                            <path d="M 320,460 L 600,460 L 600,490 L 320,490 Z" fill="url(#dockGrad)" stroke="#1e293b" stroke-width="2"/>
+                            <!-- Línea de Atraque Muelle 2 -->
+                            <line x1="320" y1="460" x2="600" y2="460" stroke="#f0803c" stroke-width="3" stroke-dasharray="4,4"/>
+
+                            <!-- Dique Central Interior (Muelles 3, 4, 5) -->
+                            <!-- Muelle 3 -->
+                            <path d="M 480,360 L 780,360 L 780,390 L 480,390 Z" fill="url(#dockGrad)" stroke="#1e293b" stroke-width="2"/>
+                            <line x1="480" y1="360" x2="780" y2="360" stroke="#f0803c" stroke-width="3" stroke-dasharray="4,4"/>
+
+                            <!-- Muelle 4 -->
+                            <path d="M 460,260 L 730,260 L 730,290 L 460,290 Z" fill="url(#dockGrad)" stroke="#1e293b" stroke-width="2"/>
+                            <line x1="460" y1="260" x2="730" y2="260" stroke="#f0803c" stroke-width="3" stroke-dasharray="4,4"/>
+
+                            <!-- Muelle 5 (Contradique de protección superior) -->
+                            <path d="M 440,160 L 520,160 L 520,185 L 440,185 Z" fill="url(#dockGrad)" stroke="#1e293b" stroke-width="2"/>
+                            <line x1="440" y1="160" x2="520" y2="160" stroke="#f0803c" stroke-width="3" stroke-dasharray="4,4"/>
+
+
+                            <!-- ============================================== -->
+                            <!-- SEÑALIZACIÓN DE PROFUNDIDADES (INFOGRAFÍA) -->
+                            <!-- ============================================== -->
+                            
+                            <!-- Badges Muelle 1 -->
+                            <circle cx="250" cy="400" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="250" y="404" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">13.6</text>
+
+                            <circle cx="150" cy="270" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="150" y="274" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">12.6</text>
+
+                            <!-- Badges Muelle 2 -->
+                            <circle cx="450" cy="475" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="450" y="479" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">10.4</text>
+
+                            <circle cx="560" cy="475" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="560" y="479" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">9.5</text>
+
+                            <!-- Badges Muelle 3 -->
+                            <circle cx="700" cy="375" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="700" y="379" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">11.8</text>
+
+                            <circle cx="580" cy="375" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="580" y="379" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">7.6</text>
+
+                            <!-- Badges Muelle 4 -->
+                            <circle cx="710" cy="275" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="710" y="279" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">9.8</text>
+
+                            <circle cx="590" cy="275" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="590" y="279" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">12.1</text>
+
+                            <circle cx="520" cy="275" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="520" y="279" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">11.4</text>
+
+                            <!-- Badges Muelle 5 -->
+                            <circle cx="490" cy="172" r="14" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                            <text x="490" y="176" font-size="10" font-weight="extrabold" fill="#fff" text-anchor="middle">12.5</text>
+
+
+                            <!-- NOMBRES DE MUELLES EN EL MAPA -->
+                            <text x="140" y="450" font-size="12" font-weight="black" fill="#1e293b" transform="rotate(56, 140, 450)">MUELLE 1</text>
+                            <text x="360" y="520" font-size="12" font-weight="black" fill="#1e293b">MUELLE 2</text>
+                            <text x="640" y="415" font-size="12" font-weight="black" fill="#1e293b">MUELLE 3</text>
+                            <text x="620" y="315" font-size="12" font-weight="black" fill="#1e293b">MUELLE 4</text>
+                            <text x="440" y="210" font-size="10" font-weight="black" fill="#1e293b">MUELLE 5</text>
+
+                            <!-- ============================================== -->
+                            <!-- CAPA DINÁMICA DE BUQUES ATRACADOS (RENDER JS) -->
+                            <!-- ============================================== -->
+                            <g id="ships-layer"></g>
+                        </svg>
+
+                        <!-- ELEMENTO TOOLTIP RICH CARD (SE ALINEA AL MOUSE EN JS) -->
+                        <div id="tooltip-puerto" class="absolute hidden bg-slate-900 text-white p-4 rounded-xl shadow-2xl z-40 border border-slate-700 w-64 pointer-events-none transition-all duration-150">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER CEPA -->
+    <footer class="bg-navy-900 text-slate-400 py-6 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span class="font-bold text-white">CEPA - El Salvador</span>
+            <p>© 2026 Comisión Executive Portuaria Autónoma. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- NOTIFICACIÓN TIPO TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 bg-navy-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 z-50">
+        <i id="toastIcon" class="fa-solid text-xl"></i>
+        <span id="toastMsg" class="text-sm font-medium"></span>
+    </div>
+
+    <!-- SCRIPT LOGICO DEL MÓDULO 2 (VIBE CODING) -->
+    <script>
+        // Parámetros oficiales de diseño físico de muelles (Capacidades de diseño de Acajutla)
+        const CAPACIDADES_MUELLES = {
+            "muelle-1": { esloraMax: 220, caladoMax: 13.60, nombre: "Muelle 1" },
+            "muelle-2": { esloraMax: 260, caladoMax: 11.80, nombre: "Muelle 2" },
+            "muelle-3": { esloraMax: 270, caladoMax: 12.10, nombre: "Muelle 3" },
+            "muelle-4": { esloraMax: 240, caladoMax: 9.80,  nombre: "Muelle 4" },
+            "muelle-5": { esloraMax: 150, caladoMax: 10.40, nombre: "Muelle 5" }
+        };
+
+        // Posicionamiento de gráficos de barcos dentro del SVG
+        const ANCLAJES_VIRTUALES = {
+            "muelle-1": { x: 195, y: 345, rotate: 56.5, scaleX: 1, type: "diagonal" },
+            "muelle-2": { x: 460, y: 445, rotate: 0, scaleX: 1, type: "horizontal" },
+            "muelle-3": { x: 630, y: 345, rotate: 0, scaleX: 1, type: "horizontal" },
+            "muelle-4": { x: 595, y: 245, rotate: 0, scaleX: 1, type: "horizontal" },
+            "muelle-5": { x: 480, y: 145, rotate: 0, scaleX: 0.6, type: "horizontal" }
+        };
+
+        // Estado Local
+        let listadoBuques = [];
+        let mapaOcupaciones = {}; // Mapeo { "muelleId": "buqueId" }
+
+        window.onload = function() {
+            cargarDatos();
+            sincronizarFondeaderoAI(); // Autonavegación inteligente
+            actualizarUI();
+        };
+
+        // Carga de base local unificada (acajutla_buques_v3)
+        function cargarDatos() {
+            listadoBuques = JSON.parse(localStorage.getItem('acajutla_buques_v3')) || [];
+            mapaOcupaciones = JSON.parse(localStorage.getItem('acajutla_ocupacion_v3')) || {
+                "muelle-1": null,
+                "muelle-2": null,
+                "muelle-3": null,
+                "muelle-4": null,
+                "muelle-5": null
+            };
+        }
+
+        // Si hay buques y ningún atraque, atracar automáticamente para demostración de impacto
+        function sincronizarFondeaderoAI() {
+            let hayOcupacion = Object.values(mapaOcupaciones).some(val => val !== null);
+            if (!hayOcupacion && listadoBuques.length > 0) {
+                // Autoatracar de acuerdo a compatibilidades
+                listadoBuques.forEach(b => {
+                    for (let mId in CAPACIDADES_MUELLES) {
+                        if (!mapaOcupaciones[mId]) {
+                            const cap = CAPACIDADES_MUELLES[mId];
+                            if (b.eslora <= cap.esloraMax && b.calado <= cap.caladoMax) {
+                                mapaOcupaciones[mId] = b.id;
+                                b.estado = "Atracado en " + cap.nombre;
+                                break;
+                            }
+                        }
+                    }
+                });
+                salvarDatos();
+            }
+        }
+
+        function salvarDatos() {
+            localStorage.setItem('acajutla_ocupacion_v3', JSON.stringify(mapaOcupaciones));
+            localStorage.setItem('acajutla_buques_v3', JSON.stringify(listadoBuques));
+        }
+
+        // Renderizado del Mapa y Fondeadero
+        function actualizarUI() {
+            renderFondeaderoList();
+            renderSelects();
+            renderShipsOnMap();
+            actualizarChequeoCompatibilidad();
+        }
+
+        function renderFondeaderoList() {
+            const listContainer = document.getElementById('lista-fondeadero');
+            listContainer.innerHTML = '';
+
+            const fondeados = listadoBuques.filter(b => {
+                // No estar atracado en ningún muelle
+                return !Object.values(mapaOcupaciones).includes(b.id);
+            });
+
+            document.getElementById('badge-fondeadero-cnt').innerText = fondeados.length;
+
+            if (fondeados.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-6 text-slate-400">
+                        <i class="fa-solid fa-square-circle-plus text-xl mb-1 opacity-50 block"></i>
+                        Ningún buque en fondeadero.
+                    </div>
+                `;
+                return;
+            }
+
+            fondeados.forEach(b => {
+                const item = document.createElement('div');
+                item.className = "p-3 bg-slate-50 border rounded-xl hover:border-acajutla-teal transition text-xs flex justify-between items-center";
+                item.innerHTML = `
+                    <div>
+                        <strong class="text-navy-800 block">${b.nombre}</strong>
+                        <span class="text-slate-400 font-semibold block text-[10px]">Esl: ${b.eslora}m | Cal: ${b.calado}m</span>
+                        <span class="text-[10px] text-indigo-600 block font-bold">${b.tipoCarga}</span>
+                    </div>
+                    <button onclick="seleccionarBarcoController('${b.id}')" class="px-2.5 py-1 bg-acajutla-blue hover:bg-navy-800 text-white rounded font-bold text-[10px] transition shadow" title="Cargar a Maniobra">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function renderSelects() {
+            const sb = document.getElementById('select-buque');
+            const sm = document.getElementById('select-muelle');
+
+            // Mantener selecciones
+            const prevB = sb.value;
+            const prevM = sm.value;
+
+            sb.innerHTML = '<option value="">-- Buques Fondeados --</option>';
+            listadoBuques.forEach(b => {
+                const atracado = Object.values(mapaOcupaciones).includes(b.id);
+                if (!atracado) {
+                    sb.innerHTML += `<option value="${b.id}">${b.nombre} (Cal: ${b.calado}m)</option>`;
+                }
+            });
+
+            sb.value = prevB;
+            sm.value = prevM;
+        }
+
+        function seleccionarBarcoController(bId) {
+            document.getElementById('select-buque').value = bId;
+            actualizarChequeoCompatibilidad();
+            showToast("Embarcación cargada para planificación de maniobra.", "fa-circle-info text-blue-500");
+        }
+
+        // Verificación predictiva en vivo
+        function actualizarChequeoCompatibilidad() {
+            const bId = document.getElementById('select-buque').value;
+            const mId = document.getElementById('select-muelle').value;
+            const panel = document.getElementById('check-panel');
+
+            if (!bId || !mId) {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            const b = listadoBuques.find(x => x.id === bId);
+            const cap = CAPACIDADES_MUELLES[mId];
+
+            if (!b || !cap) return;
+
+            panel.classList.remove('hidden');
+
+            const esloraOk = b.eslora <= cap.esloraMax;
+            const caladoOk = b.calado <= cap.caladoMax;
+
+            const esloraCell = document.getElementById('check-eslora');
+            const caladoCell = document.getElementById('check-calado');
+
+            if (esloraOk) {
+                esloraCell.innerHTML = `<span class="text-slate-600">Límite de Eslora:</span> <span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> Compatible (${b.eslora}m / ${cap.esloraMax}m)</span>`;
+            } else {
+                esloraCell.innerHTML = `<span class="text-slate-600">Límite de Eslora:</span> <span class="text-red-500 font-bold"><i class="fa-solid fa-xmark"></i> Excede (${b.eslora}m > ${cap.esloraMax}m)</span>`;
+            }
+
+            if (caladoOk) {
+                caladoCell.innerHTML = `<span class="text-slate-600">Seguridad Calado:</span> <span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> Seguro (${b.calado}m / ${cap.caladoMax}m)</span>`;
+            } else {
+                caladoCell.innerHTML = `<span class="text-slate-600">Seguridad Calado:</span> <span class="text-red-500 font-bold animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Riesgo Encallado (${b.calado}m > ${cap.caladoMax}m)</span>`;
+            }
+        }
+
+        // Ejecutar Maniobra de Entrada
+        function ejecutarAtraque() {
+            const bId = document.getElementById('select-buque').value;
+            const mId = document.getElementById('select-muelle').value;
+
+            if (!bId || !mId) {
+                showToast("Por favor selecciona un buque y un muelle.", "fa-circle-exclamation text-amber-500");
+                return;
+            }
+
+            const b = listadoBuques.find(x => x.id === bId);
+            const cap = CAPACIDADES_MUELLES[mId];
+
+            if (mapaOcupaciones[mId]) {
+                showToast("El muelle se encuentra ocupado actualmente.", "fa-circle-xmark text-red-500");
+                return;
+            }
+
+            // Advertencias físicas duras
+            const esloraOk = b.eslora <= cap.esloraMax;
+            const caladoOk = b.calado <= cap.caladoMax;
+
+            if (!esloraOk) {
+                showToast("Denegado: Eslora superior a la capacidad estructural del muelle.", "fa-ban text-red-500");
+                return;
+            }
+
+            if (!caladoOk) {
+                if (!confirm("ADVERTENCIA CRÍTICA CEPA: El calado del buque excede el calado máximo de muelle. ¿Deseas forzar la maniobra bajo responsabilidad del práctico del puerto?")) {
+                    return;
+                }
+            }
+
+            // Consolidar maniobra
+            mapaOcupaciones[mId] = b.id;
+            b.estado = "Atracado en " + cap.nombre;
+            
+            salvarDatos();
+            actualizarUI();
+            
+            document.getElementById('select-buque').value = '';
+            document.getElementById('select-muelle').value = '';
+
+            showToast("¡Maniobra autorizada! El buque ha sido atracado.", "fa-anchor text-emerald-500");
+        }
+
+        // Desatracar buque de muelle
+        function desatracarBuque(mId) {
+            const bId = mapaOcupaciones[mId];
+            if (!bId) return;
+
+            const b = listadoBuques.find(x => x.id === bId);
+            if (b) {
+                b.estado = "En Espera (Fondeadero)";
+            }
+
+            mapaOcupaciones[mId] = null;
+            salvarDatos();
+            actualizarUI();
+            hideTooltip();
+            showToast("Maniobra de salida completada. Buque regresa a Fondeadero.", "fa-ship text-blue-500");
+        }
+
+        function liberarTodo() {
+            if (confirm("¿Desatracar todas las embarcaciones del puerto?")) {
+                listadoBuques.forEach(b => {
+                    b.estado = "En Espera (Fondeadero)";
+                });
+                for (let key in mapaOcupaciones) {
+                    mapaOcupaciones[key] = null;
+                }
+                salvarDatos();
+                actualizarUI();
+                showToast("Puerto liberado.", "fa-anchor text-emerald-500");
+            }
+        }
+
+        // ==========================================
+        // DIBUJO DE BUQUES VECTORIALES EN EL MAPA SVG
+        // ==========================================
+        function renderShipsOnMap() {
+            const layer = document.getElementById('ships-layer');
+            layer.innerHTML = '';
+
+            for (let mId in ANCLAJES_VIRTUALES) {
+                const bId = mapaOcupaciones[mId];
+                if (bId) {
+                    const b = listadoBuques.find(x => x.id === bId);
+                    if (!b) continue;
+
+                    const coord = ANCLAJES_VIRTUALES[mId];
+                    const cap = CAPACIDADES_MUELLES[mId];
+                    const sobrecalado = b.calado > cap.caladoMax;
+
+                    // Crear grupo SVG interactivo
+                    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    group.setAttribute("transform", `translate(${coord.x}, ${coord.y}) rotate(${coord.rotate}) scale(${coord.scaleX}, 1)`);
+                    group.setAttribute("class", "cursor-pointer group");
+
+                    // Estructura vectorial del buque portacontenedores CEPA
+                    group.innerHTML = `
+                        <!-- Sombra del casco -->
+                        <path d="M -80,5 L 60,5 C 75,5 85,2 95,-15 L 95,-15 C 85,-32 75,-35 60,-35 L -80,-35 Z" fill="#020617" opacity="0.25"/>
+                        <!-- Casco Principal -->
+                        <path d="M -85,0 L 55,0 C 70,0 80,-3 90,-15 C 80,-27 70,-30 55,-30 L -85,-30 Z" fill="${sobrecalado ? '#dc2626' : '#1e3a8a'}" stroke="#0f172a" stroke-width="1.5"/>
+                        <!-- Cubierta Blanca -->
+                        <path d="M -80,-3 L 50,-3 L 65,-27 L -80,-27 Z" fill="#f8fafc"/>
+                        
+                        <!-- Bloques de Contenedores de Colores (Logística real) -->
+                        <rect x="-65" y="-23" width="22" height="18" fill="#f0803c" rx="1"/>
+                        <rect x="-41" y="-23" width="22" height="18" fill="#1d70b8" rx="1"/>
+                        <rect x="-17" y="-23" width="22" height="18" fill="#00a896" rx="1"/>
+                        <rect x="7" y="-23" width="22" height="18" fill="#eab308" rx="1"/>
+
+                        <!-- Puente de Mando / Estructura del Barco -->
+                        <rect x="35" y="-28" width="15" height="23" fill="#e2e8f0" stroke="#0f172a" stroke-width="1"/>
+                        <rect x="38" y="-23" width="9" height="5" fill="#bae6fd"/> <!-- Ventana -->
+                        <rect x="42" y="-34" width="3" height="7" fill="#475569"/> <!-- Chimenea -->
+
+                        <!-- Línea de flotación -->
+                        <line x1="-85" y1="0" x2="65" y2="0" stroke="${sobrecalado ? '#ef4444' : '#60a5fa'}" stroke-width="1.5"/>
+                    `;
+
+                    // Detectores de eventos para Tooltip
+                    group.addEventListener('mouseenter', (e) => showTooltip(b, mId, e));
+                    group.addEventListener('mousemove', (e) => moveTooltip(e));
+                    group.addEventListener('mouseleave', () => hideTooltip());
+                    group.addEventListener('click', () => {
+                        if (confirm(`¿Autorizar maniobra de desatraque y salida para el buque ${b.nombre}?`)) {
+                            desatracarBuque(mId);
+                        }
+                    });
+
+                    layer.appendChild(group);
+                }
+            }
+        }
+
+        // ==========================================
+        // TOOLTIP DINÁMICO HOVER
+        // ==========================================
+        function showTooltip(b, mId, event) {
+            const tooltip = document.getElementById('tooltip-puerto');
+            const cap = CAPACIDADES_MUELLES[mId];
+            const caladoOk = b.calado <= cap.caladoMax;
+
+            tooltip.innerHTML = `
+                <div class="space-y-2.5">
+                    <div class="flex justify-between items-start border-b border-slate-700 pb-2">
+                        <div>
+                            <strong class="text-xs text-white block">${b.nombre}</strong>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase block">${b.tipoCarga}</span>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded bg-slate-800 text-[9px] font-mono font-bold text-acajutla-orange">${cap.nombre}</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-300">
+                        <div>
+                            <span class="text-slate-400 block text-[9px]">ESLORA / CALADO:</span>
+                            <span>${b.eslora}m / ${b.calado}m</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[9px]">HORAS OPER:</span>
+                            <span>${b.horasOperacion ? b.horasOperacion + ' hrs' : 'S/D'}</span>
+                        </div>
+                    </div>
+
+                    <div class="text-[10px] font-mono text-slate-300 pt-1">
+                        <span class="text-slate-400 block text-[9px]">CRONOGRAMA PLANIFICADO:</span>
+                        <span>Atraque: ${b.inicioAtraque}</span>
+                    </div>
+
+                    <div class="border-t border-slate-800 pt-2 flex items-center justify-between text-[9px] font-bold">
+                        <span class="text-slate-400">ESTATUS HIDROGRÁFICO:</span>
+                        ${caladoOk ? 
+                            '<span class="text-emerald-400 flex items-center"><i class="fa-solid fa-circle text-[7px] mr-1"></i> SEGURO</span>' : 
+                            '<span class="text-red-500 animate-pulse flex items-center"><i class="fa-solid fa-circle text-[7px] mr-1"></i> RIESGO SOBRECALADO</span>'
+                        }
+                    </div>
+                    <p class="text-[8px] text-slate-500 text-center italic mt-1">Haz clic en el barco para desatracar.</p>
+                </div>
+            `;
+
+            tooltip.classList.remove('hidden');
+            moveTooltip(event);
+        }
+
+        function moveTooltip(event) {
+            const tooltip = document.getElementById('tooltip-puerto');
+            // Obtener el contenedor del mapa
+            const container = tooltip.parentElement.getBoundingClientRect();
+            
+            // Posicionar relativo al contenedor
+            let x = event.clientX - container.left + 15;
+            let y = event.clientY - container.top + 15;
+
+            // Evitar desborde derecho
+            if (x + 260 > container.width) {
+                x = event.clientX - container.left - 275;
+            }
+            // Evitar desborde inferior
+            if (y + 180 > container.height) {
+                y = event.clientY - container.top - 195;
+            }
+
+            tooltip.style.left = `${x}px`;
+            tooltip.style.top = `${y}px`;
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip-puerto').classList.add('hidden');
+        }
+
+        // Toast de alertas
+        function showToast(msg, iconClass) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const message = document.getElementById('toastMsg');
+
+            icon.className = "fa-solid " + iconClass;
+            message.innerText = msg;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
